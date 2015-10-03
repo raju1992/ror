@@ -4,6 +4,7 @@ task :extract => :environment do
 
   require 'nokogiri'
   require 'open-uri'
+  require 'geocoder'
 
   doc=Nokogiri::HTML(open("https://mlh.io/seasons/f2015/events"))
 
@@ -13,8 +14,22 @@ task :extract => :environment do
     date=t.css("p").first.text
     location=t.css("p").last.text
 
-    eventcreate=Eventinfo.create(name:name,datesofevent:date,location:location)
+    s=Geocoder.search(location);
+    lat=s[0].latitude
+    lon=s[0].longitude
+    puts lat
+    #puts lon
+
+    eventcreate=Eventinfo.create(name:name,datesofevent:date,location:location,latitude:lat,longitude:lon);
 
 
   end
+end
+
+
+task :coordinates => :environment do
+  require 'geocoder'
+
+  s=Geocoder.search(" Adsdfsdfdfs");
+  puts s[0].latitude,s[0].longitude
 end

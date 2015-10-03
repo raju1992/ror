@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151002185812) do
+ActiveRecord::Schema.define(version: 20151003081434) do
 
   create_table "eventinfos", force: :cascade do |t|
     t.string   "name"
@@ -19,6 +19,8 @@ ActiveRecord::Schema.define(version: 20151002185812) do
     t.string   "location"
     t.datetime "created_at",   null: false
     t.datetime "updated_at",   null: false
+    t.float    "latitude"
+    t.float    "longitude"
   end
 
 end
