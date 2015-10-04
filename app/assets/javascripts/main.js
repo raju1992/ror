@@ -39,7 +39,7 @@ $(document).ready(function(){
                 });
 
                 draw(data);
-               
+
                 if($("table").hasClass("parent")){
 
                     map(data);

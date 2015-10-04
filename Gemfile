@@ -12,6 +12,8 @@ gem 'turbolinks',   '2.3.0'
 gem 'jbuilder',     '2.2.3'
 gem 'bootstrap-sass', '3.2.0.0'
 gem 'bcrypt',          '3.1.7'
+gem 'gmaps4rails' , '2.1.2'
+gem 'geocoder'
 
 
 gem 'sdoc',         '0.4.0', group: :doc
@@ -21,8 +23,8 @@ group :development, :test do
   gem 'byebug',      '3.4.0'
   gem 'web-console', '2.0.0.beta3'
   gem 'spring',      '1.1.3'
-  gem 'gmaps4rails'
-  gem 'geocoder'
+  #gem 'gmaps4rails'
+  #gem 'geocoder'
 end
 
 group :test do
@@ -32,6 +34,8 @@ group :test do
 end
 
 group :production do
+  gem 'gmaps4rails' , '2.1.2'
+  gem 'geocoder'
   gem 'pg',             '0.17.1'
   gem 'rails_12factor', '0.0.2'
 end
