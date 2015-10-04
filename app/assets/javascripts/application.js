@@ -11,9 +11,10 @@
 // about supported directives.
 //
 //= require jquery
+//= require jquery-migrate-min
 //= require jquery_ujs
 //= require turbolinks
 //= require d3
 //= require underscore
 //= require gmaps/google
-//=require_tree .
+//= require_tree .
