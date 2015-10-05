@@ -9,13 +9,13 @@
 $(document).ready(function(){
     var $fact=$('.parent');
     var $qwerty=$('.new-parent');
+    var $d3=$('#graph');
     var $map=$('#multi_markers');
     //$("table").toggle()
     $('#button-click').on('click',function(event){
         event.preventDefault();
 
-
-
+        //console.log("ffffffffff");
         $.ajax({
             url: "",
             type:"GET",
@@ -23,26 +23,16 @@ $(document).ready(function(){
             dataType: 'json',
 
             success:function(data){
-                var dict={};
-                // dict["a"]=1;
-                $.each(data,function(i,info){
-                    var qwe=info.location;
-                    qwe=qwe.split(',');
-                    qwe=qwe[1];
-                    //console.log(qwe);
-                    dict[qwe]?dict[qwe].value+=1:dict[qwe]={value:1};
 
 
-                });
-                $.each(dict,function(i,j){
-                    console.log(i+":"+dict[i].value);
-                });
 
-                draw(data);
 
                 if($("table").hasClass("parent")){
 
                     map(data);
+                    drawd3();
+
+
 
 
                     $fact.append('<tr><th>Name</th><th>Date</th><th>Location</th></tr>');
@@ -58,8 +48,11 @@ $(document).ready(function(){
                 else{
                     $map.remove()
                     $fact.empty()
+                    $d3.remove()
                     $("#mapping").append('<div  id="multi_markers" style="width: 250px; height: 250px;"></div>');
                     $map=$('#multi_markers')
+                    $(".graphing").append('<svg id="graph" width="400" height="400"></svg>')
+                    $d3=$('#graph')
 
                     $("table").removeClass("new-parent").addClass("parent");
 
@@ -69,39 +62,16 @@ $(document).ready(function(){
 
 
             },
-            error:function(response){
-                console.log(status)
 
-            }
 
 
         });
-       /* function draw(data){
-            var color= d3.scale.category20b();
-            var width=420,
-            barHeight=20;
-            var x=d3.scale.linear()
-                .range([0,width])
-                .domain([0,d3.max(data)]);
-            var chart=d3.select("#graph").attr("width",width).attr("height",barHeight*data.length);
-            var bar=chart.selectAll("g").data(data).enter().append("g").attr("transform",function(d,i){
-                return "translate(0,"+i*barHeight+")";
-            });
-            bar.append("rect").attr("width",x).attr("height",barHeight-1).style("fill",function(d){
-                return color(d)
-            })
-            bar.append("text").attr("x",function(d){
-                return x(d)-10;
-            })
-                .attr("y",barHeight/2)
-                .attr("dy",".35em")
-                .style("fill","white")
-                .text(function(d){
-                    return d;
-                });
-        }*/
+
+
 
         function map(data){
+
+
             var handler = Gmaps.build('Google');
             handler.buildMap({ internal: {id: 'multi_markers'}}, function(){
                 var t=[];
@@ -115,52 +85,198 @@ $(document).ready(function(){
                 handler.fitMapToBounds();
             });
         }
-        function draw(dict){
 
 
-            var margin ={top:20,right:20,bottom:30,left:40},
-                width=960-margin.left-margin.right,
-                height=500-margin.top-margin.bottom;
-            var y=d3.scale.linear()
-                .domain([0,10])
-                .range([0,1]);
-            var x= d3.scale.ordinal()
-                .rangeRoundBands([0,width],.1)
-                .domain(d3.entries(dict).map(function(d){return d.key;}));
-            var xAxis=d3.svg.axis()
-                .scale(x)
-                .orient("bootom");
-            var yAxis=d3.svg.axis()
-                .scale(y)
-                .orient("left");
+      /*  function drawd3(){
 
-          /*  var dict={};
-           // dict["a"]=1;
-            $.each(data,function(i,info){
-                var qwe=info.location;
-                qwe=qwe.split(',');
-                qwe=qwe[1];
-                //console.log(qwe);
-               dict[qwe]?dict[qwe].value+=1:dict[qwe]={value:1};
+            var bardata=[{
+                'x':'2012',
+                'y':'20'
+            },
+                {
+                    'x':'2013',
+                    'y':'19'
+                },
+                {
+                    'x':'2014',
+                    'y':'24'
+                },
+                {
+                    'x':'2015',
+                    'y':'19'
+                }];
+            var vis=d3.select("#visualisation"),
+                width=1000,
+                height=500,
+                margins={
+                    top:20,
+                    right:20,
+                    bottom:20,
+                    left:50
+                },
+                xrange=d3.select.ordinal().rangeRoundBands([margins.left,width-margins.right],0.1).domain(bardata.map(function(d){
+                    return d.x;
+                })),
+                yrange=d3.scale.linear().range([height-margins.top,margins.bottom]).domain([0,d3.max(bardata,function(d){
+                    return d.y;
+                })
+                ]),
+                xaxis=d3.svg.axis()
+                    .scale(xrange)
+                    .tickSize(5)
+                    .tickSubdivide(true),
+                yaxis=d3.svg.axis()
+                    .scale(yrange)
+                    .tickSize(5)
+                    .orient("left")
+                    .tickSubdivide(true);
+            vis.append('svg:g')
+                .attr('class','x axis')
+                .attr('transform','translate(0,'+(height-margins.bottom)+')')
+                .call(xaxis);
+            vis.append('svg:g')
+                .attr('class','y axis')
+                .attr('transform','translate('+(margins.left)+',0)')
+                .call(yaxis);
+            vis.selectAll('rect')
+                .data(bardata)
+                .enter()
+                .append('rect')
+                .attr('x',function(d){
+                    return xrange(d.x);
+                })
+                .attr('y',function(d){
+                    return yrange(d.y);
+                })
+                .attr('width',xrange.rangeBand())
+                .attr('height',function(d){
+                    return ((height-margins.bottom)-yrange(d.y));
+                })
+                .attr('fill','grey')
+                .on('mouseover',function(d){
+                    d3.select(this)
+                        .attr('fill','blue');
+                })
+                .on('mouseout',function(d){
+                    d3.select(this)
+                        .attr('fill','grey');
+
+                });
 
 
-            });*/
-          /*  $.each(dict,function(i,j){
-               console.log(i+":"+dict[i].value);
-            });*/
-           /* var x=d3.scale.linear()
-                .domain([0,d3.max(data)])
-                .range([0,420]);
-            d3.select(".chart")
-                .selectAll("div")
-                .data(data)
-                .enter().append("div")
-                .style("width",function(d){return x(d)+"px";})
-                .text(function(d){return d;});*/
-        }
+        }*/
+
+        function drawd3(){
+
+        var barData = [{
+            'x': 2012,
+            'y': 19
+        }, {
+            'x': 2013,
+            'y': 25
+        }, {
+            'x': 2014,
+            'y': 14
+        }, {
+            'x': 2015,
+            'y': 27
+        }];
+
+        //alert("bbbbbbbbbbbbbbbbb")
+
+        var map = d3.select('#graph'),
+            WIDTH = 400,
+            HEIGHT = 400,
+            MARGINS = {
+                top: 20,
+                right: 20,
+                bottom: 20,
+                left: 50
+            },
+            xRange = d3.scale.ordinal().rangeRoundBands([MARGINS.left, WIDTH - MARGINS.right], 0.5).domain(barData.map(function (d) {
+                return d.x;
+            })),
 
 
+            yRange = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([0,
+                d3.max(barData, function (d) {
+                    return d.y;
+                })
+            ]),
 
+            xAxis = d3.svg.axis()
+                .scale(xRange)
+                .tickSize(2)
+                .orient("bottom")
+                .tickSubdivide(true),
+
+            yAxis = d3.svg.axis()
+                .scale(yRange)
+                .tickSize(2)
+                .orient("left")
+                .tickSubdivide(true);
+
+
+        map.append('svg:g')
+            .attr('class', 'x axis')
+            .attr('transform', 'translate(0,' + (HEIGHT - MARGINS.bottom) + ')')
+            .call(xAxis);
+        map.append("text")
+            .attr("x",WIDTH/2)
+            .attr("y",(MARGINS.left-MARGINS.right)/2)
+            .style("text-anchor","middle")
+            .text("Hackathons in each year");
+            map.append("text")
+                .attr("x",WIDTH/2)
+                .attr("y",HEIGHT+MARGINS.bottom)
+                .style("text-anchor","middle")
+                .text("years");
+
+        map.append('svg:g')
+
+            .attr('class', 'y axis')
+            .attr('transform', 'translate(' + (MARGINS.left) + ',0)')
+            .call(yAxis);
+
+            map.append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 0 - (MARGINS.left))
+                .attr("x", 0 -(HEIGHT / 2))
+                .attr("dy", "1em")
+                .style("text-anchor", "middle")
+                .text("Value");
+        /*map.append("text")
+            .attr("transform","rotate(-90)")
+            .attr("y",0-MARGINS.left)
+            .attr("x",0-HEIGHT)
+            .attr("dy","1em")
+            .style("text-anchor","middle")
+            .text("number of hackathons");*/
+        map.selectAll('rect')
+            .data(barData)
+            .enter()
+            .append('rect')
+            .attr('x', function (d) {
+                return xRange(d.x);
+            })
+            .attr('y', function (d) {
+                return yRange(d.y);
+            })
+            .attr('width', xRange.rangeBand())
+            .attr('height', function (d) {
+                return ((HEIGHT - MARGINS.bottom) - yRange(d.y));
+            })
+            .attr('fill', 'red')
+            .on('mouseover',function(d){
+                d3.select(this)
+                    .attr('fill','blue');
+            })
+            .on('mouseout',function(d){
+                d3.select(this)
+                    .attr('fill','red');
+            });
+
+    }
 
 
     });
