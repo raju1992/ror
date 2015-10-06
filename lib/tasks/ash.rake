@@ -30,6 +30,6 @@ end
 task :coordinates => :environment do
   require 'geocoder'
 
-  s=Geocoder.search(" Adsdfsdfdfs");
+  s=Geocoder.search("newyork");
   puts s[0].latitude,s[0].longitude
 end
